@@ -10,14 +10,11 @@
 
     <artifactId>jsmpp</artifactId>
 
-    <licenses>
-        <license>
-            <url>http://apache.org/licenses/LICENSE-2.0</url>
-            <name>Apache License v2</name>
-        </license>
-    </licenses>
-
     <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
@@ -35,14 +32,6 @@
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

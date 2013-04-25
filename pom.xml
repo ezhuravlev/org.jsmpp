@@ -20,28 +20,36 @@
             <name>Nuruddin Ashr</name>
         </developer>
     </developers>
+    
+    <licenses>
+        <license>
+            <url>http://apache.org/licenses/LICENSE-2.0</url>
+            <name>Apache License v2</name>
+        </license>
+    </licenses>
 
     <properties>
-        <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-        <buildNumber>${maven.build.timestamp}</buildNumber>
+        <java.version>1.6</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <slf4j.version>1.6.1</slf4j.version>
-        <git.properties>git.properties</git.properties>
+
+        <maven-bundle-plugin>2.3.7</maven-bundle-plugin>
+        <maven-clean-plugin>2.5</maven-clean-plugin>
+        <maven-compiler-plugin>3.0</maven-compiler-plugin>
+        <maven-deploy-plugin>2.7</maven-deploy-plugin>
+        <maven-jar-plugin>2.4</maven-jar-plugin>
+        <maven-javadoc-plugin>2.9</maven-javadoc-plugin>
+        <maven-release-plugin>2.2.1</maven-release-plugin>
+        <maven-resources-plugin>2.6</maven-resources-plugin>
+        <maven-source-plugin>2.2.1</maven-source-plugin>
+        <maven-surefire-plugin>2.14</maven-surefire-plugin>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-    </dependencies>
+    <distributionManagement>
+        <repository>
+            <id>ru.ventra.ebr.public</id>
+            <url>https://ebr.ventra.ru/public</url>
+        </repository>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
@@ -51,25 +59,32 @@
                 <version>5.14.10</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
+                <version>1.6.1</version>
             </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
+                <version>1.6.1</version>
             </dependency>
-
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>1.4</version>
             </dependency>
-
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -79,124 +94,64 @@
     </dependencyManagement>
 
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>2.0</version>
-            </extension>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh-external</artifactId>
-                <version>2.0</version>
-            </extension>
-        </extensions>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>utf-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-            </plugin>
-        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.1</version>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin}</version>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
-                    <executions>
-                        <execution>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>pl.project13.maven</groupId>
-                    <artifactId>git-commit-id-plugin</artifactId>
-                    <version>1.9</version>
-                    <executions>
-                        <execution>
-                            <phase>initialize</phase>
-                            <goals>
-                                <goal>revision</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin}</version>
                     <configuration>
-                        <!-- that's the default value, you don't have to set it -->
-                        <prefix>git</prefix>
-
-                        <!-- that's the default value -->
-                        <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
-
-                        <!-- false is default here, it prints some more information during the build -->
-                        <verbose>true</verbose>
-                        <!-- this is false by default, forces the plugin to generate the git.properties file -->
-                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
-
-                        <!-- The path for the to be generated properties file, it's relative to ${project.basedir} -->
-                        <generateGitPropertiesFilename>${git.properties}</generateGitPropertiesFilename>
+                        <source>${project.build.jre}</source>
+                        <target>${project.build.jre}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
                     </configuration>
-
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>properties-maven-plugin</artifactId>
-                    <version>1.0-alpha-2</version>
-                    <executions>
-                        <execution>
-                            <phase>initialize</phase>
-                            <goals>
-                                <goal>read-project-properties</goal>
-                            </goals>
-                            <configuration>
-                                <files>
-                                    <file>${git.properties}</file>
-                                </files>
-                            </configuration>
-                        </execution>
-                    </executions>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.3.2</version>
-                    <configuration>
-                        <archive>
-                            <manifest>
-                                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            </manifest>
-                            <manifestEntries>
-                                <Implementation-Version>${project.version}-${git.branch}.${git.commit.id.abbrev}</Implementation-Version>
-                                <Dependencies>org.apache.log4j</Dependencies>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
+                    <version>${maven-jar-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${maven-javadoc-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${maven-release-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>${maven-source-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com:uudashr/jsmpp.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:kostousov-ds/jsmpp.git</developerConnection>
+        <connection>scm:git:git@github.com:ezhuravlev/org.jsmpp.git</connection>
     </scm>
 
 </project>
