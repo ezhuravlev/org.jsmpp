@@ -169,12 +169,12 @@ public class AutoReconnectGateway implements Gateway {
     }
     
     public static void main(String[] args) throws IOException {
-        Gateway gateway = new AutoReconnectGateway("localhost", 8056, 
+        new AutoReconnectGateway("localhost", 8056, 
                 new BindParameter(BindType.BIND_TRX, "sms", "sms", "sms", 
                         TypeOfNumber.UNKNOWN, NumberingPlanIndicator.ISDN, "8080"));
         
         while (true) {
-            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            try { Thread.sleep(1000); } catch (InterruptedException e) { log.error(e.getMessage(), e); }
         }
     }
 }

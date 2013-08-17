@@ -28,6 +28,8 @@ import org.jsmpp.bean.TypeOfNumber;
 import org.jsmpp.session.SMPPSession;
 import org.jsmpp.util.RelativeTimeFormatter;
 import org.jsmpp.util.TimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is example to send message in unicode format, such as arabic, greek,
@@ -40,6 +42,8 @@ import org.jsmpp.util.TimeFormatter;
  * 
  */
 public class SendUnicode {
+    private static transient Logger log = LoggerFactory.getLogger(SendUnicode.class);
+    
     public static void main(String[] args) throws Exception {
         SMPPSession session = null; // 1. initialize
         // 2. Initiate bind
@@ -67,5 +71,6 @@ public class SendUnicode {
                 new RegisteredDelivery(SMSCDeliveryReceipt.DEFAULT), (byte)0, 
                 dataCoding, 
                 (byte)0, data);
+        log.info("Message submitted, message_id is " + messageId);
     }
 }
