@@ -22,6 +22,8 @@ import org.jsmpp.bean.DataCodings;
 import org.jsmpp.bean.IndicationSense;
 import org.jsmpp.bean.IndicationType;
 import org.jsmpp.bean.MessageWaitingDataCoding;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 /**
@@ -29,6 +31,7 @@ import org.testng.annotations.Test;
  *
  */
 public class MessageWaitingDataCodingStoreMessageAlphaDefaultTest {
+    private static transient Logger log = LoggerFactory.getLogger(MessageWaitingDataCodingStoreMessageAlphaDefaultTest.class);
     
     @Test
     public void messageWaitingDiscardMessageInactiveVoicemail() {
@@ -39,8 +42,8 @@ public class MessageWaitingDataCodingStoreMessageAlphaDefaultTest {
                 Alphabet.ALPHA_DEFAULT);
         byte expected = (byte)0xd0;
         
-        System.out.println(0xff & expected);
-        System.out.println(0xff & dataCoding.toByte());
+        log.info("" + (0xff & expected));
+        log.info("" + (0xff & dataCoding.toByte()));
         
         assertEquals(dataCoding.toByte(), expected);
         

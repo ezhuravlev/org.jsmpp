@@ -24,12 +24,16 @@ import org.jsmpp.session.DataSmResult;
 import org.jsmpp.session.MessageReceiverListener;
 import org.jsmpp.session.Session;
 import org.jsmpp.util.InvalidDeliveryReceiptException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author uudashr
  *
  */
 public class MessageReceiverListenerImpl implements MessageReceiverListener {
+    private static transient Logger log = LoggerFactory.getLogger(MessageReceiverListenerImpl.class);
+    
     public void onAcceptDeliverSm(DeliverSm deliverSm)
             throws ProcessRequestException {
         
@@ -47,10 +51,9 @@ public class MessageReceiverListenerImpl implements MessageReceiverListener {
                  * database based on messageId
                  */
                 
-                System.out.println("Receiving delivery receipt for message '" + messageId + " ' from " + deliverSm.getSourceAddr() + " to " + deliverSm.getDestAddress() + " : " + delReceipt);
+                log.info("Receiving delivery receipt for message '" + messageId + " ' from " + deliverSm.getSourceAddr() + " to " + deliverSm.getDestAddress() + " : " + delReceipt);
             } catch (InvalidDeliveryReceiptException e) {
-                System.err.println("Failed getting delivery receipt");
-                e.printStackTrace();
+                log.error("Failed getting delivery receipt", e);
             }
         } else {
             // this message is regular short message
@@ -59,7 +62,7 @@ public class MessageReceiverListenerImpl implements MessageReceiverListener {
              * you can save the incoming message to database.
              */
             
-            System.out.println("Receiving message : " + new String(deliverSm.getShortMessage()));
+            log.info("Receiving message : " + new String(deliverSm.getShortMessage()));
         }
     }
     

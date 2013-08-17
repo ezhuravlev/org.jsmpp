@@ -20,6 +20,8 @@ import org.jsmpp.PDUStringException;
 import org.jsmpp.SMPPConstant;
 import org.jsmpp.bean.BindResp;
 import org.jsmpp.bean.BindType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 /**
@@ -28,7 +30,7 @@ import org.testng.annotations.Test;
  *
  */
 public class ComposerDecomposerReaderTest {
-    private static final boolean DEBUG = false;
+    private static transient Logger log = LoggerFactory.getLogger(ComposerDecomposerReaderTest.class);
     
     @Test(groups="checkintest")
     public void lowLevel() {
@@ -39,7 +41,9 @@ public class ComposerDecomposerReaderTest {
         buf.append(systemId);
         b = buf.toBytes();
         assertEquals(b.length, 16 + systemId.length() + 1);
-        printLog("Length of bytes : " + b.length);
+        if (log.isDebugEnabled()) {
+            log.debug("Length of bytes : " + b.length);
+        }
         
         
         SequentialBytesReader reader = new SequentialBytesReader(b);
@@ -80,7 +84,9 @@ public class ComposerDecomposerReaderTest {
         try {
             b = composer.bindResp(bindType.responseCommandId(), 1, systemId);
             assertEquals(b.length, 16 + systemId.length() + 1);
-            printLog("Length of bytes : " + b.length);
+            if (log.isDebugEnabled()) {
+                log.debug("Length of bytes : " + b.length);
+            }
         } catch (PDUStringException e) {
             fail("Failed composing bind response", e);
         }
@@ -94,12 +100,6 @@ public class ComposerDecomposerReaderTest {
             assertEquals(resp.getSystemId(), systemId);
         } catch (PDUStringException e) {
             fail("Failed decomposing bind response", e);
-        }
-    }
-    
-    private static void printLog(String message) {
-        if (DEBUG) {
-            System.out.println(message);
         }
     }
 }

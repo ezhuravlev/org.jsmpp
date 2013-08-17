@@ -37,6 +37,8 @@ import org.jsmpp.session.BindParameter;
 import org.jsmpp.session.SMPPSession;
 import org.jsmpp.util.AbsoluteTimeFormatter;
 import org.jsmpp.util.TimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,6 +46,7 @@ import org.jsmpp.util.TimeFormatter;
  *
  */
 public class SubmitMultiExample {
+    private static transient Logger log = LoggerFactory.getLogger(SubmitMultiExample.class);
 
     private static TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
 
@@ -64,8 +67,7 @@ public class SubmitMultiExample {
                                                         null));
             
         } catch (IOException e) {
-            System.err.println("Failed connect and bind to host");
-            e.printStackTrace();
+            log.error("Failed connect and bind to host", e);
         }
 
         try {
@@ -77,30 +79,24 @@ public class SubmitMultiExample {
                                                         new RegisteredDelivery(SMSCDeliveryReceipt.SUCCESS), ReplaceIfPresentFlag.REPLACE,
                                                         new GeneralDataCoding(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1, false), (byte)0,
                                                         "jSMPP simplify SMPP on Java platform".getBytes());
-            System.out.println("Messages submitted, result is " + result);
+            log.info("Messages submitted, result is " + result);
             Thread.sleep(2000);
         } catch (PDUException e) {
             // Invalid PDU parameter
-            System.err.println("Invalid PDU parameter");
-            e.printStackTrace();
+            log.error("Invalid PDU parameter", e);
         } catch (ResponseTimeoutException e) {
             // Response timeout
-            System.err.println("Response timeout");
-            e.printStackTrace();
+            log.error("Response timeout", e);
         } catch (InvalidResponseException e) {
             // Invalid response
-            System.err.println("Receive invalid respose");
-            e.printStackTrace();
+            log.error("Receive invalid respose", e);
         } catch (NegativeResponseException e) {
             // Receiving negative response (non-zero command_status)
-            System.err.println("Receive negative response");
-            e.printStackTrace();
+            log.error("Receive negative response", e);
         } catch (IOException e) {
-            System.err.println("IO error occur");
-            e.printStackTrace();
+            log.error("IO error occur", e);
         } catch (InterruptedException e) {
-            System.err.println("Thread interrupted");
-            e.printStackTrace();
+            log.error("Thread interrupted", e);
         }
 
         session.unbindAndClose();

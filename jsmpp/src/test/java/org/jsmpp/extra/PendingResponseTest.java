@@ -18,6 +18,8 @@ import org.jsmpp.InvalidResponseException;
 import org.jsmpp.bean.Command;
 import static org.testng.Assert.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -26,6 +28,8 @@ import org.testng.annotations.Test;
  *
  */
 public class PendingResponseTest {
+    private static transient Logger log = LoggerFactory.getLogger(PendingResponseTest.class);
+    
     private PendingResponse<Command> pendingResponse;
     
     @BeforeMethod
@@ -66,7 +70,7 @@ public class PendingResponseTest {
         try {
             notifyInvalidResponse(90, pendingResponse);
             pendingResponse.waitDone();
-            System.out.println("DONE");
+            log.info("DONE");
             fail("Should throw InvalidResponseException");
         } catch (ResponseTimeoutException e) {
             fail("Should throw InvalidResponseException");

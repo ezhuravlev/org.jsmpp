@@ -1,0 +1,32 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+        <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+    </encoder>
+  </appender>
+  <appender name="STRESS-CLIENT-FILE" class="ch.qos.logback.core.FileAppender">
+    <file>stress/logs/client.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="STRESS-SERVER-FILE" class="ch.qos.logback.core.FileAppender">
+    <file>stress/logs/server.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="org.jsmpp.examples.StressClient" level="DEBUG">
+    <appender-ref ref="STRESS-CLIENT-FILE" />
+    <appender-ref ref="STDOUT" />
+  </logger>
+  <logger name="org.jsmpp.examples.StressServer" level="DEBUG">
+    <appender-ref ref="STRESS-SERVER-FILE" />
+    <appender-ref ref="STDOUT" />
+  </logger>
+  
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

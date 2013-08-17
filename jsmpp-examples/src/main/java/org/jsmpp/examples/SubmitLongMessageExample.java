@@ -35,21 +35,24 @@ import org.jsmpp.session.BindParameter;
 import org.jsmpp.session.SMPPSession;
 import org.jsmpp.util.AbsoluteTimeFormatter;
 import org.jsmpp.util.TimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author uudashr
  *
  */
 public class SubmitLongMessageExample {
-    private static TimeFormatter timeFormatter = new AbsoluteTimeFormatter();;
+    private static transient Logger log = LoggerFactory.getLogger(SubmitLongMessageExample.class);
+    
+    private static TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
     
     public static void main(String[] args) {
         SMPPSession session = new SMPPSession();
         try {
             session.connectAndBind("localhost", 8056, new BindParameter(BindType.BIND_TX, "test", "test", "cp", TypeOfNumber.UNKNOWN, NumberingPlanIndicator.UNKNOWN, null));
         } catch (IOException e) {
-            System.err.println("Failed connect and bind to host");
-            e.printStackTrace();
+            log.error("Failed connect and bind to host", e);
         }
         Random random = new Random();
         
@@ -62,7 +65,7 @@ public class SubmitLongMessageExample {
             String message = "Message part " + seqNum + " of " + totalSegments + " ";
             OptionalParameter sarSegmentSeqnum = OptionalParameters.newSarSegmentSeqnum(seqNum);
             String messageId = submitMessage(session, message, sarMsgRefNum, sarSegmentSeqnum, sarTotalSegments);
-            System.out.println("Message submitted, message_id is " + messageId);
+            log.info("Message submitted, message_id is " + messageId);
         }
         
         session.unbindAndClose();
@@ -74,23 +77,18 @@ public class SubmitLongMessageExample {
             messageId = session.submitShortMessage("CMT", TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, "1616", TypeOfNumber.INTERNATIONAL, NumberingPlanIndicator.UNKNOWN, "628176504657", new ESMClass(), (byte)0, (byte)1,  timeFormatter.format(new Date()), null, new RegisteredDelivery(SMSCDeliveryReceipt.DEFAULT), (byte)0, DataCodings.ZERO, (byte)0, message.getBytes(), sarMsgRefNum, sarSegmentSeqnum, sarTotalSegments);;
         } catch (PDUException e) {
             // Invalid PDU parameter
-            System.err.println("Invalid PDU parameter");
-            e.printStackTrace();
+            log.error("Invalid PDU parameter", e);
         } catch (ResponseTimeoutException e) {
             // Response timeout
-            System.err.println("Response timeout");
-            e.printStackTrace();
+            log.error("Response timeout", e);
         } catch (InvalidResponseException e) {
             // Invalid response
-            System.err.println("Receive invalid respose");
-            e.printStackTrace();
+            log.error("Receive invalid respose", e);
         } catch (NegativeResponseException e) {
             // Receiving negative response (non-zero command_status)
-            System.err.println("Receive negative response");
-            e.printStackTrace();
+            log.error("Receive negative response", e);
         } catch (IOException e) {
-            System.err.println("IO error occur");
-            e.printStackTrace();
+            log.error("IO error occur", e);
         }
         return messageId;
     }

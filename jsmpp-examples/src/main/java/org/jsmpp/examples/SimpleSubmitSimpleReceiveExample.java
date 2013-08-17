@@ -17,7 +17,6 @@ package org.jsmpp.examples;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.log4j.BasicConfigurator;
 import org.jsmpp.InvalidResponseException;
 import org.jsmpp.PDUException;
 import org.jsmpp.bean.AlertNotification;
@@ -45,13 +44,17 @@ import org.jsmpp.session.Session;
 import org.jsmpp.util.AbsoluteTimeFormatter;
 import org.jsmpp.util.InvalidDeliveryReceiptException;
 import org.jsmpp.util.TimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author terukizm
  * 
  */
 public class SimpleSubmitSimpleReceiveExample {
-    private static TimeFormatter timeFormatter = new AbsoluteTimeFormatter();;
+    private static transient Logger log = LoggerFactory.getLogger(SimpleSubmitSimpleReceiveExample.class);
+    
+    private static TimeFormatter timeFormatter = new AbsoluteTimeFormatter();
 
     public static void main(String[] args) {
         String server = "localhost";
@@ -64,8 +67,7 @@ public class SimpleSubmitSimpleReceiveExample {
             session.connectAndBind(server, port, new BindParameter(BindType.BIND_TRX, "test", "test", "cp",
                     TypeOfNumber.UNKNOWN, NumberingPlanIndicator.UNKNOWN, null));
         } catch (IOException e) {
-            System.err.println("Failed connect and bind to host");
-            e.printStackTrace();
+            log.error("Failed connect and bind to host", e);
         }
 
         // send Message
@@ -80,31 +82,25 @@ public class SimpleSubmitSimpleReceiveExample {
                     registeredDelivery, (byte)0, new GeneralDataCoding(Alphabet.ALPHA_DEFAULT, MessageClass.CLASS1,
                             false), (byte)0, message.getBytes());
 
-            System.out.println("Message submitted, message_id is " + messageId);
+            log.info("Message submitted, message_id is " + messageId);
 
         } catch (PDUException e) {
             // Invalid PDU parameter
-            System.err.println("Invalid PDU parameter");
-            e.printStackTrace();
+            log.error("Invalid PDU parameter", e);
         } catch (ResponseTimeoutException e) {
             // Response timeout
-            System.err.println("Response timeout");
-            e.printStackTrace();
+            log.error("Response timeout", e);
         } catch (InvalidResponseException e) {
             // Invalid response
-            System.err.println("Receive invalid respose");
-            e.printStackTrace();
+            log.error("Receive invalid respose", e);
         } catch (NegativeResponseException e) {
             // Receiving negative response (non-zero command_status)
-            System.err.println("Receive negative response");
-            e.printStackTrace();
+            log.error("Receive negative response", e);
         } catch (IOException e) {
-            System.err.println("IO error occur");
-            e.printStackTrace();
+            log.error("IO error occur", e);
         }
 
         // receive Message
-        BasicConfigurator.configure();
 
         // Set listener to receive deliver_sm
         session.setMessageReceiverListener(new MessageReceiverListener() {
@@ -116,23 +112,22 @@ public class SimpleSubmitSimpleReceiveExample {
                         DeliveryReceipt delReceipt = deliverSm.getShortMessageAsDeliveryReceipt();
                         long id = Long.parseLong(delReceipt.getId()) & 0xffffffff;
                         String messageId = Long.toString(id, 16).toUpperCase();
-                        System.out.println("received '" + messageId + "' : " + delReceipt);
+                        log.info("received '" + messageId + "' : " + delReceipt);
                     } catch (InvalidDeliveryReceiptException e) {
-                        System.err.println("receive faild");
-                        e.printStackTrace();
+                        log.error("receive faild", e);
                     }
                 } else {
                     // regular short message
-                    System.out.println("Receiving message : " + new String(deliverSm.getShortMessage()));
+                    log.info("Receiving message : " + new String(deliverSm.getShortMessage()));
                 }
             }
 
             public void onAcceptAlertNotification(AlertNotification alertNotification) {
-                System.out.println("onAcceptAlertNotification");
+                log.info("onAcceptAlertNotification");
             }
 
             public DataSmResult onAcceptDataSm(DataSm dataSm, Session source) throws ProcessRequestException {
-                System.out.println("onAcceptDataSm");
+                log.info("onAcceptDataSm");
                 return null;
             }
         });
@@ -141,13 +136,12 @@ public class SimpleSubmitSimpleReceiveExample {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         // unbind(disconnect)
         session.unbindAndClose();
 
-        System.out.println("finish!");
+        log.info("finish!");
     }
-
 }

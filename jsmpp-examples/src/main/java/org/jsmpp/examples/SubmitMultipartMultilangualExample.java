@@ -38,6 +38,8 @@ import org.jsmpp.session.BindParameter;
 import org.jsmpp.session.SMPPSession;
 import org.jsmpp.session.Session;
 import org.jsmpp.session.SessionStateListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -45,6 +47,7 @@ import org.jsmpp.session.SessionStateListener;
  * 
  */
 public class SubmitMultipartMultilangualExample {
+    private static transient Logger log = LoggerFactory.getLogger(SubmitMultipartMultilangualExample.class);
 
 	private static final int MAX_MULTIPART_MSG_SEGMENT_SIZE_UCS2 = 134;
 	private static final int MAX_SINGLE_MSG_SEGMENT_SIZE_UCS2 = 70;
@@ -53,7 +56,7 @@ public class SubmitMultipartMultilangualExample {
 
 	private class SessionStateListenerImpl implements SessionStateListener {
 		public void onStateChange(SessionState newState, SessionState oldState, Session source) {
-			System.out.println("Session state changed from " + oldState + " to " + newState);
+		    log.info("Session state changed from " + oldState + " to " + newState);
 		}
 	}
 
@@ -130,8 +133,8 @@ public class SubmitMultipartMultilangualExample {
 			session.connectAndBind("localhost", 2775, new BindParameter(BindType.BIND_TRX, "smppclient", "password",
 					"cp", TypeOfNumber.UNKNOWN, NumberingPlanIndicator.UNKNOWN, null));
 		} catch (IOException e) {
-			System.err.println("Failed connect and bind to host");
-			e.printStackTrace();
+			log.error("Failed connect and bind to host", e);
+			return;
 		}
 
 		// configure variables acording to if message contains national
@@ -165,19 +168,18 @@ public class SubmitMultipartMultilangualExample {
 			esmClass = new ESMClass();
 		}
 
-		System.out.println("Sending message " + messageBody);
-		System.out.printf("Message is %d characters long and will be sent as %d messages with params: %s %s ",
+		log.info("Sending message " + messageBody);
+		log.info("Message is %d characters long and will be sent as %d messages with params: %s %s ",
 				messageBody.length(), byteMessagesArray.length, alphabet, messageClass);
-		System.out.println();
 
 		// submit all messages
 		for (int i = 0; i < byteMessagesArray.length; i++) {
 			String messageId = submitMessage(session, byteMessagesArray[i], sourceMsisdn, destinationMsisdn,
 					messageClass, alphabet, esmClass);
-			System.out.println("Message submitted, message_id is " + messageId);
+			log.info("Message submitted, message_id is " + messageId);
 		}
 
-		System.out.println("Entering listening mode. Press enter to finish...");
+		log.info("Entering listening mode. Press enter to finish...");
 
 		try {
 			System.in.read();
@@ -258,5 +260,4 @@ class Gsm0338 {
 		}
 		return true;
 	}
-
 }

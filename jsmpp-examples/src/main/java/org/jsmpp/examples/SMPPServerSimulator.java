@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.jsmpp.PDUStringException;
 import org.jsmpp.SMPPConstant;
 import org.jsmpp.bean.CancelSm;
@@ -65,7 +64,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implements Runnable, ServerMessageReceiverListener {
     private static final Integer DEFAULT_PORT = 8056;
-    private static final Logger logger = LoggerFactory.getLogger(SMPPServerSimulator.class);
+    private static transient Logger log = LoggerFactory.getLogger(SMPPServerSimulator.class);
+    
     private final ExecutorService execService = Executors.newFixedThreadPool(5);
     private final ExecutorService execServiceDelReciept = Executors.newFixedThreadPool(100);
     private final MessageIDGenerator messageIDGenerator = new RandomMessageIDGenerator();
@@ -79,29 +79,29 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
         try {
             SMPPServerSessionListener sessionListener = new SMPPServerSessionListener(port);
             
-            logger.info("Listening on port {}", port);
+            log.info("Listening on port {}", port);
             while (true) {
                 SMPPServerSession serverSession = sessionListener.accept();
-                logger.info("Accepting connection for session {}", serverSession.getSessionId());
+                log.info("Accepting connection for session {}", serverSession.getSessionId());
                 serverSession.setMessageReceiverListener(this);
                 serverSession.setResponseDeliveryListener(this);
                 execService.execute(new WaitBindTask(serverSession));
             }
         } catch (IOException e) {
-            logger.error("IO error occured", e);
+            log.error("IO error occured", e);
         }
     }
     
     public QuerySmResult onAcceptQuerySm(QuerySm querySm,
             SMPPServerSession source) throws ProcessRequestException {
-        logger.info("Accepting query sm, but not implemented");
+        log.info("Accepting query sm, but not implemented");
         return null;
     }
     
     public MessageId onAcceptSubmitSm(SubmitSm submitSm,
             SMPPServerSession source) throws ProcessRequestException {
         MessageId messageId = messageIDGenerator.newMessageId();
-        logger.debug("Receiving submit_sm '{}', and return message id {}", new String(submitSm.getShortMessage()), messageId);
+        log.debug("Receiving submit_sm '{}', and return message id {}", new String(submitSm.getShortMessage()), messageId);
         if (SMSCDeliveryReceipt.SUCCESS.containedIn(submitSm.getRegisteredDelivery()) || SMSCDeliveryReceipt.SUCCESS_FAILURE.containedIn(submitSm.getRegisteredDelivery())) {
             execServiceDelReciept.execute(new DeliveryReceiptTask(source, submitSm, messageId));
         }
@@ -111,13 +111,13 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
     @Override
     public void onSubmitSmRespSent(MessageId messageId,
             SMPPServerSession source) {
-        logger.debug("submit_sm_resp with message_id {} has been sent", messageId);
+        log.debug("submit_sm_resp with message_id {} has been sent", messageId);
     }
     
     public SubmitMultiResult onAcceptSubmitMulti(SubmitMulti submitMulti,
             SMPPServerSession source) throws ProcessRequestException {
         MessageId messageId = messageIDGenerator.newMessageId();
-        logger.debug("Receiving submit_multi_sm '{}', and return message id {}", 
+        log.debug("Receiving submit_multi_sm '{}', and return message id {}", 
                 new String(submitMulti.getShortMessage()), 
                 messageId);
         if (SMSCDeliveryReceipt.SUCCESS.containedIn(submitMulti.getRegisteredDelivery())
@@ -151,20 +151,20 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
         public void run() {
             try {
                 BindRequest bindRequest = serverSession.waitForBind(1000);
-                logger.info("Accepting bind for session {}, interface version {}", serverSession.getSessionId());
+                log.info("Accepting bind for session {}, interface version {}", serverSession.getSessionId());
                 try {
                     bindRequest.accept("sys", InterfaceVersion.IF_34);
                 } catch (PDUStringException e) {
-                    logger.error("Invalid system id", e);
+                    log.error("Invalid system id", e);
                     bindRequest.reject(SMPPConstant.STAT_ESME_RSYSERR);
                 }
             
             } catch (IllegalStateException e) {
-                logger.error("System error", e);
+                log.error("System error", e);
             } catch (TimeoutException e) {
-                logger.warn("Wait for bind has reach timeout", e);
+                log.warn("Wait for bind has reach timeout", e);
             } catch (IOException e) {
-                logger.error("Failed accepting bind request for session {}", serverSession.getSessionId());
+                log.error("Failed accepting bind request for session {}", serverSession.getSessionId());
             }
         }
     }
@@ -235,7 +235,7 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
             }
             SessionState state = session.getSessionState();
             if (!state.isReceivable()) {
-                logger.debug("Not sending delivery receipt for message id " + messageId + " since session state is " + state);
+                log.debug("Not sending delivery receipt for message id " + messageId + " since session state is " + state);
                 return;
             }
             String stringValue = Integer.valueOf(messageId.getValue(), 16).toString();
@@ -256,9 +256,9 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
                         new RegisteredDelivery(0), 
                         DataCodings.ZERO, 
                         delRec.toString().getBytes());
-                logger.debug("Sending delivery reciept for message id " + messageId + ":" + stringValue);
+                log.debug("Sending delivery reciept for message id " + messageId + ":" + stringValue);
             } catch (Exception e) {
-                logger.error("Failed sending delivery_receipt for message id " + messageId + ":" + stringValue, e);
+                log.error("Failed sending delivery_receipt for message id " + messageId + ":" + stringValue, e);
             }
         }
     }
@@ -270,7 +270,6 @@ public class SMPPServerSimulator extends ServerResponseDeliveryAdapter implement
         } catch (NumberFormatException e) {
             port = DEFAULT_PORT;
         }
-        BasicConfigurator.configure();
         SMPPServerSimulator smppServerSim = new SMPPServerSimulator(port);
         smppServerSim.run();
     }
