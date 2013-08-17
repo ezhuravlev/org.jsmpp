@@ -21,6 +21,7 @@ import org.jsmpp.SMPPConstant;
  * 
  */
 public class SubmitSm extends MessageRequest {
+    private static final long serialVersionUID = -6216865641483826052L;
 
     public SubmitSm() {
         super();

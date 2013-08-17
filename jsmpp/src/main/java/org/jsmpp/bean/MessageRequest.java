@@ -22,6 +22,8 @@ import java.util.Arrays;
  * 
  */
 public class MessageRequest extends AbstractSmCommand {
+    private static final long serialVersionUID = 5020181832372374307L;
+    
     protected byte protocolId;
     protected byte priorityFlag;
     protected String scheduleDeliveryTime;

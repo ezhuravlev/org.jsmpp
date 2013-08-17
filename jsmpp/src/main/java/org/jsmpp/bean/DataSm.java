@@ -20,6 +20,8 @@ package org.jsmpp.bean;
  * 
  */
 public class DataSm extends AbstractSmCommand {
+    private static final long serialVersionUID = -8354770615648691390L;
+
     public DataSm() {
         super();
     }

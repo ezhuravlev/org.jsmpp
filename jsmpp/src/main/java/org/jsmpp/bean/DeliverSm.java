@@ -22,8 +22,9 @@ import org.jsmpp.util.InvalidDeliveryReceiptException;
  *
  */
 public class DeliverSm extends MessageRequest {
-    
-	public DeliverSm() {
+    private static final long serialVersionUID = 2522737727234256116L;
+
+    public DeliverSm() {
 		super();
 	}
 	
