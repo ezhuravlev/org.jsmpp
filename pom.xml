@@ -24,9 +24,9 @@
 
     <ch.qos.logback>1.0.13</ch.qos.logback>
     <org.apache.commons.codec>1.4</org.apache.commons.codec>
-    <org.junit>4.8.2</org.junit>
+    <org.junit>4.11</org.junit>
     <org.slf4j>1.7.5</org.slf4j>
-    <org.testng>5.14.10</org.testng>
+    <org.testng>6.8.5</org.testng>
   </properties>
 
   <dependencyManagement>
@@ -40,11 +40,6 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${ch.qos.logback}</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>${org.apache.commons.codec}</version>
       </dependency>
       <dependency>
         <groupId>org.testng</groupId>
