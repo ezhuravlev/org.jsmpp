@@ -20,7 +20,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import org.jsmpp.session.SMPPSession;
 import org.jsmpp.session.connection.Connection;
 import org.jsmpp.util.StrictBufferedInputStream;
 import org.slf4j.Logger;
